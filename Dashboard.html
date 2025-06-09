@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GreenTube Studio – Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e0e0e;
+      color: #fff;
+    }
+    header {
+      background: linear-gradient(90deg, #00ff99, #00bbff);
+      padding: 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #111;
+      text-shadow: 0 0 4px #fff;
+    }
+    .dashboard {
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    .logo {
+      width: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+    .stat-box {
+      background-color: #1a1a1a;
+      border: 2px solid #00ff99;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .stat-box h3 {
+      margin: 0 0 10px;
+      color: #00ff99;
+      font-size: 1.2rem;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>GreenTube Studio – Dashboard</header>
+  <div class="dashboard">
+    <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Default-avatar.jpg" alt="Logo kanału" />
+    <h2 id="channelName">GreenTube Channel</h2>
+
+    <div class="stat-box">
+      <h3>Subskrybenci</h3>
+      <div class="stat-value" id="subsCount">...</div>
+    </div>
+
+    <div class="stat-box">
+      <h3>Czas oglądania (godz.)</h3>
+      <div class="stat-value" id="watchTime">...</div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAcDfl7Y6mpn2KFCVEP2w2n98Q0jmn8tmo",
+      authDomain: "greentube-studio.firebaseapp.com",
+      projectId: "greentube-studio",
+      storageBucket: "greentube-studio.firebasestorage.app",
+      messagingSenderId: "610414209521",
+      appId: "1:610414209521:web:9a89134d9fa1cad4b47c50",
+      measurementId: "G-J9E6YLQ7NE"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Pobierz dane z dokumentu "stats/dashboard"
+    db.collection("stats").doc("dashboard").get().then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        document.getElementById("subsCount").textContent = data.subs || 0;
+        document.getElementById("watchTime").textContent = data.watchTime || 0;
+        if (data.channelName) {
+          document.getElementById("channelName").textContent = data.channelName;
+        }
+        if (data.logoURL) {
+          document.querySelector(".logo").src = data.logoURL;
+        }
+      } else {
+        console.log("Brak danych w bazie.");
+      }
+    }).catch((error) => {
+      console.error("Błąd podczas pobierania danych:", error);
+    });
+  </script>
+</body>
+</html>
