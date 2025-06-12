@@ -92,8 +92,8 @@
   </form>
 
   <script>
-    const cloudName = 'YOUR_CLOUD_NAME'; // np. 'greentube'
-    const unsignedUploadPreset = 'YOUR_UNSIGNED_PRESET'; // preset unsigned do uploadu (musisz stworzyć w Cloudinary)
+    const cloudName = 'dmnazdbzq'; // np. 'greentube'
+    const unsignedUploadPreset = 'Upload'; // preset unsigned do uploadu (musisz stworzyć w Cloudinary)
 
     const form = document.getElementById('uploadForm');
     const fileInput = document.getElementById('fileInput');
@@ -113,7 +113,7 @@
       progressFill.style.width = '0%';
       status.textContent = '';
 
-      const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+      const url = `https://api.cloudinary.com/v1_1/${dmnazdbzq}/upload`;
 
       const formData = new FormData();
       formData.append('file', file);
