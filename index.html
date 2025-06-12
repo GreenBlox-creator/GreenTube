@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zaloguj się</title>
+</head>
+<body>
+  <h2>GreenTube - Logowanie</h2>
+  <input id="email" type="email" placeholder="Email"><br>
+  <input id="password" type="password" placeholder="Hasło"><br>
+  <button onclick="register()">Zarejestruj się</button>
+  <button onclick="login()">Zaloguj się</button>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiNjpRQ2uqiO6yqyZJbDOgxW687RUdv6E",
+      authDomain: "authenizator.firebaseapp.com",
+      databaseURL: "https://authenizator-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "authenizator",
+      storageBucket: "authenizator.firebasestorage.app",
+      messagingSenderId: "105553215978",
+      appId: "1:105553215978:web:2ddaba326c09f4e133f293"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.register = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          alert("Rejestracja udana!");
+          window.location.href = "dashboard.html";
+        })
+        .catch((error) => alert(error.message));
+    }
+
+    window.login = function () {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = "dashboard.html";
+        })
+        .catch((error) => alert("Błąd logowania: " + error.message));
+    }
+  </script>
+</body>
+</html>
