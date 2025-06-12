@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel użytkownika</title>
+</head>
+<body>
+  <h1>Witaj w GreenTube!</h1>
+  <div id="userInfo"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBiNjpRQ2uqiO6yqyZJbDOgxW687RUdv6E",
+      authDomain: "authenizator.firebaseapp.com",
+      databaseURL: "https://authenizator-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "authenizator",
+      storageBucket: "authenizator.firebasestorage.app",
+      messagingSenderId: "105553215978",
+      appId: "1:105553215978:web:2ddaba326c09f4e133f293"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getDatabase(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userRef = ref(db, 'users/' + user.uid);
+        get(userRef).then((snapshot) => {
+          if (!snapshot.exists()) {
+            // Pierwsze logowanie – zapisujemy dane
+            set(userRef, {
+              username: user.email.split("@")[0], // tymczasowa nazwa
+              subscribers: 0
+            });
+            document.getElementById("userInfo").innerText = `Witaj, ${user.email}`;
+          } else {
+            const data = snapshot.val();
+            document.getElementById("userInfo").innerText = `Kanał: ${data.username}, Suby: ${data.subscribers}`;
+          }
+        });
+      } else {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
