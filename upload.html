@@ -91,58 +91,60 @@
     <div id="status"></div>
   </form>
 
-  <!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Twoje Filmy - GreenTube</title>
-  <style>
-    body {
-      background-color: #121212;
-      color: #0f0;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #0f0;
-    }
-    .video-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-    video {
-      width: 300px;
-      height: auto;
-      border: 2px solid #0f0;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-<body>
-
-<h1>🎥 Twoje przesłane filmy</h1>
-<div class="video-container" id="videos"></div>
-
 <script>
-  const uploadedVideos = JSON.parse(localStorage.getItem("uploadedVideos")) || [];
+  const cloudName = 'dmnazdbzq';
+  const unsignedUploadPreset = 'Upload';
 
-  const videosDiv = document.getElementById("videos");
+  const fileInput = document.getElementById('fileupload');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const status = document.getElementById('status');
 
-  if (uploadedVideos.length === 0) {
-    videosDiv.innerHTML = "<p>Nie przesłałeś jeszcze żadnych filmów.</p>";
-  } else {
-    uploadedVideos.forEach(url => {
-      const video = document.createElement("video");
-      video.src = url;
-      video.controls = true;
-      videosDiv.appendChild(video);
-    });
-  }
+  uploadBtn.addEventListener('click', () => {
+    const files = fileInput.files;
+    if (!files.length) {
+      status.textContent = 'Wybierz plik!';
+      return;
+    }
+    const file = files[0];
+
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
+
+    fd.append('upload_preset', unsignedUploadPreset);
+    fd.append('file', file);
+
+    xhr.open('POST', url, true);
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        const uploadedUrl = response.secure_url;
+
+        // Zapisz link w localStorage
+        let uploadedVideos = JSON.parse(localStorage.getItem("uploadedVideos")) || [];
+        uploadedVideos.push(uploadedUrl);
+        localStorage.setItem("uploadedVideos", JSON.stringify(uploadedVideos));
+
+        status.textContent = 'Przesyłanie zakończone!';
+
+        setTimeout(() => {
+          window.location.href = 'videos.html';
+        }, 1500);
+      } else {
+        status.textContent = 'Błąd podczas przesyłania.';
+        console.error('Błąd uploadu:', xhr.responseText);
+      }
+    };
+
+    xhr.onerror = () => {
+      status.textContent = 'Błąd sieci podczas przesyłania.';
+    };
+
+    status.textContent = 'Wysyłanie...';
+    xhr.send(fd);
+  });
 </script>
-
+  
 </body>
 </html>
