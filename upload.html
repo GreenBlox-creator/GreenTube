@@ -91,71 +91,58 @@
     <div id="status"></div>
   </form>
 
-  <script>
-    const cloudName = 'dmnazdbzq'; // np. 'greentube'
-    const unsignedUploadPreset = 'Upload'; // preset unsigned do uploadu (musisz stworzyć w Cloudinary)
+  <!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Twoje Filmy - GreenTube</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: #0f0;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #0f0;
+    }
+    .video-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    video {
+      width: 300px;
+      height: auto;
+      border: 2px solid #0f0;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
 
-    const form = document.getElementById('uploadForm');
-    const fileInput = document.getElementById('fileInput');
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = progressBar.querySelector('div');
-    const status = document.getElementById('status');
+<h1>🎥 Twoje przesłane filmy</h1>
+<div class="video-container" id="videos"></div>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const file = fileInput.files[0];
-      if (!file) {
-        alert('Proszę wybrać plik!');
-        return;
-      }
+<script>
+  const uploadedVideos = JSON.parse(localStorage.getItem("uploadedVideos")) || [];
 
-      progressBar.style.display = 'block';
-      progressFill.style.width = '0%';
-      status.textContent = '';
+  const videosDiv = document.getElementById("videos");
 
-      const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
-
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', unsignedUploadPreset);
-
-      try {
-        const xhr = new XMLHttpRequest();
-
-        xhr.open('POST', url);
-
-        xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            const percent = (e.loaded / e.total) * 100;
-            progressFill.style.width = percent + '%';
-            status.textContent = `Przesyłanie: ${Math.round(percent)}%`;
-          }
-        });
-
-        xhr.onload = () => {
-          if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            status.textContent = 'Przesyłanie zakończone!';
-            // Po udanym uploadzie przekieruj na videos.html
-            setTimeout(() => {
-              window.location.href = 'videos.html';
-            }, 1500);
-          } else {
-            status.textContent = 'Błąd podczas przesyłania.';
-          }
-        };
-
-        xhr.onerror = () => {
-          status.textContent = 'Błąd sieci podczas przesyłania.';
-        };
-
-        xhr.send(formData);
-
-      } catch (error) {
-        status.textContent = 'Coś poszło nie tak: ' + error.message;
-      }
+  if (uploadedVideos.length === 0) {
+    videosDiv.innerHTML = "<p>Nie przesłałeś jeszcze żadnych filmów.</p>";
+  } else {
+    uploadedVideos.forEach(url => {
+      const video = document.createElement("video");
+      video.src = url;
+      video.controls = true;
+      videosDiv.appendChild(video);
     });
-  </script>
+  }
+</script>
 
 </body>
 </html>
