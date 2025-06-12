@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload w GreenTube Studio</title>
+  <style>
+    body {
+      background-color: #121917;
+      color: #e0f2e9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+      height: 100vh;
+      justify-content: center;
+    }
+    h1 {
+      color: #a7d129;
+      text-shadow: 0 0 10px #38b000cc;
+      margin-bottom: 40px;
+    }
+    form {
+      background: #1a2a1a;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #38b000cc;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 320px;
+      user-select: none;
+    }
+    input[type="file"] {
+      cursor: pointer;
+      color: #a7d129;
+      border: 2px dashed #38b000cc;
+      border-radius: 8px;
+      padding: 10px;
+      background-color: transparent;
+    }
+    button {
+      background-color: #38b000;
+      border: none;
+      color: white;
+      padding: 15px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px #38b000bb;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2a7d00;
+    }
+    #progressBar {
+      width: 100%;
+      height: 20px;
+      background-color: #0e1b0e;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      margin-top: 10px;
+    }
+    #progressBar > div {
+      height: 100%;
+      width: 0;
+      background-color: #a7d129;
+      transition: width 0.2s ease;
+    }
+    #status {
+      margin-top: 10px;
+      font-weight: 700;
+      color: #a7d129;
+      text-align: center;
+      min-height: 24px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Prześlij film do GreenTube Studio</h1>
+
+  <form id="uploadForm">
+    <input type="file" id="fileInput" accept="video/*,image/*" required />
+    <button type="submit">Prześlij</button>
+    <div id="progressBar"><div></div></div>
+    <div id="status"></div>
+  </form>
+
+  <script>
+    const cloudName = 'YOUR_CLOUD_NAME'; // np. 'greentube'
+    const unsignedUploadPreset = 'YOUR_UNSIGNED_PRESET'; // preset unsigned do uploadu (musisz stworzyć w Cloudinary)
+
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = progressBar.querySelector('div');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Proszę wybrać plik!');
+        return;
+      }
+
+      progressBar.style.display = 'block';
+      progressFill.style.width = '0%';
+      status.textContent = '';
+
+      const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', unsignedUploadPreset);
+
+      try {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('POST', url);
+
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percent = (e.loaded / e.total) * 100;
+            progressFill.style.width = percent + '%';
+            status.textContent = `Przesyłanie: ${Math.round(percent)}%`;
+          }
+        });
+
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            status.textContent = 'Przesyłanie zakończone!';
+            // Po udanym uploadzie przekieruj na videos.html
+            setTimeout(() => {
+              window.location.href = 'videos.html';
+            }, 1500);
+          } else {
+            status.textContent = 'Błąd podczas przesyłania.';
+          }
+        };
+
+        xhr.onerror = () => {
+          status.textContent = 'Błąd sieci podczas przesyłania.';
+        };
+
+        xhr.send(formData);
+
+      } catch (error) {
+        status.textContent = 'Coś poszło nie tak: ' + error.message;
+      }
+    });
+  </script>
+
+</body>
+</html>
