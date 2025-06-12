@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Upload na Cloudinary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    input[type="file"] {
+      margin-bottom: 20px;
+    }
+    button {
+      background: #0f0;
+      border: none;
+      padding: 10px 20px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload pliku</h1>
+  <input type="file" id="fileupload" />
+  <button id="uploadBtn">Wyślij</button>
+  <div id="status"></div>
+
+  <script>
+    const cloudName = 'dmnazdbzq'; // Zmień jeśli masz inną nazwę
+    const unsignedUploadPreset = 'Upload';
+
+    const fileInput = document.getElementById('fileupload');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const status = document.getElementById('status');
+
+    uploadBtn.addEventListener('click', () => {
+      const files = fileInput.files;
+      if (!files.length) {
+        status.textContent = 'Wybierz plik!';
+        return;
+      }
+      const file = files[0];
+      const url = `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
+
+      const xhr = new XMLHttpRequest();
+      const fd = new FormData();
+
+      fd.append('upload_preset', unsignedUploadPreset);
+      fd.append('file', file);
+
+      xhr.open('POST', url, true);
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText);
+          const uploadedUrl = response.secure_url;
+
+          // Zapis do localStorage
+          let uploadedVideos = JSON.parse(localStorage.getItem("uploadedVideos")) || [];
+          uploadedVideos.push(uploadedUrl);
+          localStorage.setItem("uploadedVideos", JSON.stringify(uploadedVideos));
+
+          status.textContent = 'Przesyłanie zakończone!';
+          setTimeout(() => {
+            window.location.href = 'videos.html';
+          }, 1500);
+        } else {
+          status.textContent = 'Błąd podczas przesyłania.';
+        }
+      };
+
+      xhr.onerror = () => {
+        status.textContent = 'Błąd sieci podczas przesyłania.';
+      };
+
+      status.textContent = 'Wysyłanie...';
+      xhr.send(fd);
+    });
+  </script>
+</body>
+</html>
