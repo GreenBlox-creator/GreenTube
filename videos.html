@@ -38,5 +38,42 @@
       });
     }
   </script>
+  <script>
+  const lista = document.getElementById('lista-filmow');
+
+  db.collection("filmy")
+    .orderBy("data", "desc") // od najnowszego
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const film = doc.data();
+
+        const div = document.createElement('div');
+        div.className = 'film';
+        div.innerHTML = `
+          <img class="miniaturka" src="${film.miniatura}" alt="Miniaturka">
+
+          <div class="dane-filmu">
+            <h3>${film.tytul}</h3>
+            <p>Widoczność: ${film.widocznosc}</p>
+            <p>Przesłano: ${film.data}</p>
+            <p>Wyświetlenia: ${film.wyswietlenia}</p>
+            <p>👍 ${film.likes} 👎 ${film.dislikes}</p>
+            <div class="przyciski">
+              <a href="podglad.html?id=${doc.id}"><button>▶️ Podgląd</button></a>
+              <a href="info.html?id=${doc.id}"><button>ℹ️ Info</button></a>
+              <a href="delete.html?id=${doc.id}"><button>🗑️ Usuń</button></a>
+            </div>
+          </div>
+
+          <div class="ikony">
+            <a href="edytuj-film.html?id=${doc.id}"><button>✏️</button></a>
+            <a href="statystyki.html?id=${doc.id}"><button>📊</button></a>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    });
+                                        </script>
 </body>
 </html>
