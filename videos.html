@@ -78,45 +78,50 @@
     if (videos.length === 0) {
       videoList.innerHTML = '<p style="text-align:center">Nie przesłano jeszcze żadnych filmów.</p>';
     } else {
-      videos.forEach(video => {
-        const container = document.createElement('div');
-        container.className = 'video-item';
+      videos.forEach((video, index) => {
+  const container = document.createElement('div');
+  container.className = 'video-item';
 
-        const thumb = document.createElement('img');
-        thumb.src = video.thumbnail || 'https://via.placeholder.com/200x112?text=Miniaturka';
-        thumb.className = 'video-thumb';
+  const thumb = document.createElement('img');
+  thumb.src = video.thumbnail || 'https://via.placeholder.com/200x112?text=Miniaturka';
+  thumb.className = 'video-thumb';
 
-        const info = document.createElement('div');
-        info.className = 'video-info';
+  const info = document.createElement('div');
+  info.className = 'video-info';
 
-        const title = document.createElement('div');
-        title.className = 'video-title';
-        title.textContent = video.title || 'Brak tytułu';
+  const title = document.createElement('div');
+  title.className = 'video-title';
+  title.textContent = video.title || 'Brak tytułu';
 
-        const stats = document.createElement('div');
-        stats.className = 'video-stats';
-        stats.textContent = `${video.views || 0} wyświetleń`;
+  const stats = document.createElement('div');
+  stats.className = 'video-stats';
+  stats.textContent = `${video.views || 0} wyświetleń`;
 
-        const actions = document.createElement('div');
-        actions.className = 'video-actions';
+  const actions = document.createElement('div');
+  actions.className = 'video-actions';
 
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️ Edytuj';
-        <button onclick="location.href='edit.html?index=${index}'">✏️</button>
+  const editBtn = document.createElement('button');
+  editBtn.textContent = '✏️ Edytuj';
+  editBtn.onclick = () => {
+    location.href = `edit.html?index=${index}`;
+  };
 
-        const statsBtn = document.createElement('button');
-        statsBtn.textContent = '📊 Statystyki';
+  const statsBtn = document.createElement('button');
+  statsBtn.textContent = '📊 Statystyki';
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '🗑️ Usuń';
-        deleteBtn.onclick = () => {
-          const index = videos.indexOf(video);
-          if (index > -1) {
-            videos.splice(index, 1);
-            localStorage.setItem('uploadedVideos', JSON.stringify(videos));
-            location.reload();
-          }
-        };
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = '🗑️ Usuń';
+  deleteBtn.onclick = () => {
+    videos.splice(index, 1);
+    localStorage.setItem('uploadedVideos', JSON.stringify(videos));
+    location.reload();
+  };
+
+  actions.append(editBtn, statsBtn, deleteBtn);
+  info.append(title, stats, actions);
+  container.append(thumb, info);
+  videoList.appendChild(container);
+});
 
         actions.append(editBtn, statsBtn, deleteBtn);
         info.append(title, stats, actions);
