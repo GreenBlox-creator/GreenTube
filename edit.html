@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edytuj film</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #0f0;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      background: #222;
+      border: 1px solid #0f0;
+      color: #0f0;
+    }
+    #message {
+      color: #0f0;
+      margin-top: 20px;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Edytuj film</h1>
+
+  <label for="title">Tytuł</label>
+  <input type="text" id="title" placeholder="Brak tytułu"/>
+
+  <label for="description">Opis</label>
+  <textarea id="description" placeholder="Dodaj opis" rows="4"></textarea>
+
+  <label for="visibility">Widoczność</label>
+  <select id="visibility">
+    <option value="public">Publiczny</option>
+    <option value="unlisted">Niepubliczny</option>
+    <option value="private">Prywatny</option>
+  </select>
+
+  <button id="saveBtn">Zapisz</button>
+
+  <div id="message">Zmiany zostały zapisane</div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const index = urlParams.get('index');
+    const videos = JSON.parse(localStorage.getItem('videos')) || [];
+    const video = videos[index];
+
+    const titleInput = document.getElementById('title');
+    const descInput = document.getElementById('description');
+    const visibilityInput = document.getElementById('visibility');
+    const message = document.getElementById('message');
+    const saveBtn = document.getElementById('saveBtn');
+
+    // Wczytaj dane
+    if (video) {
+      titleInput.value = video.title || 'Brak tytułu';
+      descInput.value = video.description || 'Dodaj opis';
+      visibilityInput.value = video.visibility || 'public';
+    }
+
+    saveBtn.addEventListener('click', () => {
+      // Zapisz zmiany
+      videos[index].title = titleInput.value;
+      videos[index].description = descInput.value;
+      videos[index].visibility = visibilityInput.value;
+
+      localStorage.setItem('videos', JSON.stringify(videos));
+      message.style.display = 'block';
+
+      setTimeout(() => {
+        window.location.href = 'videos.html';
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
