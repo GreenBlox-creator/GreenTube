@@ -1,79 +1,127 @@
-<!DOCTYPE html>
-<html lang="pl">
+<!DOCTYPE html><html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Twoje filmy</title>
+  <title>GreenTube Studio – Filmy</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #0f0;
+      background: #121212;
+      color: white;
+      margin: 0;
       padding: 20px;
     }
-    video {
-      display: block;
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto;
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .video-item {
+      display: flex;
+      background: #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px #000;
+    }
+    .video-thumb {
+      width: 200px;
+      height: 112px;
+      object-fit: cover;
+    }
+    .video-info {
+      flex: 1;
+      padding: 10px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .video-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .video-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+    .video-actions button {
+      background: #2e2e2e;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .video-stats {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+    .video-stats::before {
+      content: "\1F441";
     }
   </style>
 </head>
 <body>
-  <h1>Twoje przesłane filmy</h1>
-  <div id="videos"></div>
+  <h1>Twoje filmy</h1>
+  <div class="video-list" id="videoList"></div>  <script>
+    const videoList = document.getElementById('videoList');
+    const videos = JSON.parse(localStorage.getItem('uploadedVideos')) || [];
 
-  <script>
-    const videosDiv = document.getElementById('videos');
-    const uploadedVideos = JSON.parse(localStorage.getItem("uploadedVideos")) || [];
-
-    if (uploadedVideos.length === 0) {
-      videosDiv.innerHTML = "<p>Nie przesłano żadnych filmów.</p>";
+    if (videos.length === 0) {
+      videoList.innerHTML = '<p style="text-align:center">Nie przesłano jeszcze żadnych filmów.</p>';
     } else {
-      uploadedVideos.forEach(url => {
-        const video = document.createElement("video");
-        video.src = url;
-        video.controls = true;
-        videosDiv.appendChild(video);
+      videos.forEach(video => {
+        const container = document.createElement('div');
+        container.className = 'video-item';
+
+        const thumb = document.createElement('img');
+        thumb.src = video.thumbnail || 'https://via.placeholder.com/200x112?text=Miniaturka';
+        thumb.className = 'video-thumb';
+
+        const info = document.createElement('div');
+        info.className = 'video-info';
+
+        const title = document.createElement('div');
+        title.className = 'video-title';
+        title.textContent = video.title || 'Brak tytułu';
+
+        const stats = document.createElement('div');
+        stats.className = 'video-stats';
+        stats.textContent = `${video.views || 0} wyświetleń`;
+
+        const actions = document.createElement('div');
+        actions.className = 'video-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️ Edytuj';
+
+        const statsBtn = document.createElement('button');
+        statsBtn.textContent = '📊 Statystyki';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️ Usuń';
+        deleteBtn.onclick = () => {
+          const index = videos.indexOf(video);
+          if (index > -1) {
+            videos.splice(index, 1);
+            localStorage.setItem('uploadedVideos', JSON.stringify(videos));
+            location.reload();
+          }
+        };
+
+        actions.append(editBtn, statsBtn, deleteBtn);
+        info.append(title, stats, actions);
+        container.append(thumb, info);
+        videoList.appendChild(container);
       });
     }
-  </script>
-  <script>
-  const lista = document.getElementById('lista-filmow');
-
-  db.collection("filmy")
-    .orderBy("data", "desc") // od najnowszego
-    .get()
-    .then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        const film = doc.data();
-
-        const div = document.createElement('div');
-        div.className = 'film';
-        div.innerHTML = `
-          <img class="miniaturka" src="${film.miniatura}" alt="Miniaturka">
-
-          <div class="dane-filmu">
-            <h3>${film.tytul}</h3>
-            <p>Widoczność: ${film.widocznosc}</p>
-            <p>Przesłano: ${film.data}</p>
-            <p>Wyświetlenia: ${film.wyswietlenia}</p>
-            <p>👍 ${film.likes} 👎 ${film.dislikes}</p>
-            <div class="przyciski">
-              <a href="podglad.html?id=${doc.id}"><button>▶️ Podgląd</button></a>
-              <a href="info.html?id=${doc.id}"><button>ℹ️ Info</button></a>
-              <a href="delete.html?id=${doc.id}"><button>🗑️ Usuń</button></a>
-            </div>
-          </div>
-
-          <div class="ikony">
-            <a href="edytuj-film.html?id=${doc.id}"><button>✏️</button></a>
-            <a href="statystyki.html?id=${doc.id}"><button>📊</button></a>
-          </div>
-        `;
-        lista.appendChild(div);
-      });
-    });
-                                        </script>
-</body>
+  </script></body>
 </html>
